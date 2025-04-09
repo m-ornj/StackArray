@@ -54,7 +54,7 @@ numbers[0] = 9
 // Remove elements
 numbers.removeFirst()
 numbers.removeLast()
-numbers.removeAll { $0 % 2 == 0}
+numbers.removeAll { $0 % 2 == 0 }
 
 // Iterate
 for n in numbers {
