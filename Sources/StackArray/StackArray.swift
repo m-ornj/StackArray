@@ -8,7 +8,7 @@ fileprivate func zeroInitialized<T: BitwiseCopyable>() -> T {
     }
 }
 
-public struct StackArray<Element, Buffer: BitwiseCopyable> {
+public struct StackArray<Element, Buffer: BitwiseCopyable>: BitwiseCopyable where Element: BitwiseCopyable {
     static var capacity: Int { MemoryLayout<Buffer>.size / MemoryLayout<Element>.stride }
     public var capacity: Int { Self.capacity }
     
