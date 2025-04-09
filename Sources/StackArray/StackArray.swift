@@ -18,17 +18,25 @@ public struct StackArray<Element, Buffer: BitwiseCopyable> {
     public init() {}
 }
 
-extension StackArray: RandomAccessCollection {
+extension StackArray: MutableCollection, RandomAccessCollection {
     public var startIndex: Int { 0 }
     public var endIndex: Int { count }
-
+    
     public subscript(position: Int) -> Element {
-        guard position >= 0 && position < count else {
-            fatalError("Index out of range")
+        get {
+            guard position >= 0 && position < count else { fatalError("Index out of range") }
+            return withUnsafePointer(to: buffer) {
+                $0.withMemoryRebound(to: Element.self, capacity: Self.capacity) { buffer in
+                    buffer[position]
+                }
+            }
         }
-        return withUnsafePointer(to: buffer) {
-            $0.withMemoryRebound(to: Element.self, capacity: Self.capacity) { buffer in
-                buffer[position]
+        mutating set(newValue) {
+            guard position >= 0 && position < count else { fatalError("Index out of range") }
+            withUnsafeMutablePointer(to: &buffer) {
+                $0.withMemoryRebound(to: Element.self, capacity: Self.capacity) { buffer in
+                    buffer[position] = newValue
+                }
             }
         }
     }
@@ -50,9 +58,13 @@ extension StackArray: RangeReplaceableCollection {
         withUnsafeMutablePointer(to: &buffer) {
             $0.withMemoryRebound(to: Element.self, capacity: Self.capacity) { buffer in
                 // Shift tail if needed
-                if delta != 0 {
-                    let srcIndex = tailStart
-                    let dstIndex = tailStart + delta
+                let srcIndex = tailStart
+                let dstIndex = tailStart + delta
+                if delta < 0 {
+                    for i in 0..<tailCount {
+                        buffer[dstIndex + i] = buffer[srcIndex + i]
+                    }
+                } else if delta > 0 {
                     for i in (0..<tailCount).reversed() {
                         buffer[dstIndex + i] = buffer[srcIndex + i]
                     }
@@ -89,5 +101,37 @@ extension StackArray where Element: Equatable {
             }
         }
         return true
+    }
+}
+
+extension StackArray: CustomStringConvertible {
+    public var description: String {
+        var result = "["
+        var first = true
+        for element in self {
+            if !first {
+                result += ", "
+            }
+            result += String(describing: element)
+            first = false
+        }
+        result += "]"
+        return result
+    }
+}
+
+extension StackArray: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        var result = "["
+        var first = true
+        for element in self {
+            if !first {
+                result += ", "
+            }
+            result += String(reflecting: element)
+            first = false
+        }
+        result += "]"
+        return result
     }
 }
