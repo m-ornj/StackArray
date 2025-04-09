@@ -32,3 +32,37 @@ You can also define your own buffer types to tune memory layout as needed:
 typealias MyCustomBuffer = (UInt64, UInt64, UInt64, UInt16) // 208 bits = 26 bytes
 var alphabet = StackArray<Bool, MyCustomBuffer>()           // can fit 26 booleans
 ```
+
+### Usage
+
+```swift
+import StackArray
+
+var numbers: StackArray<Int, Buffer128Byte> = [0, 1, 2]
+
+// Append elements
+numbers.append(3)
+numbers.append(contentsOf: [6, 5, 4])
+
+// Insert elements
+numbers.insert(7, at: 3)
+numbers.insert(contentsOf: [8, 9], at: 4)
+
+// Modify elements
+numbers[0] = 9
+
+// Remove elements
+numbers.removeFirst()
+numbers.removeLast()
+numbers.removeAll { $0 % 2 == 0}
+
+// Iterate
+for n in numbers {
+  print(n)
+}
+
+// Sort
+numbers.sort()
+
+print("Sorted:", numbers)
+```
