@@ -10,6 +10,7 @@ A fixed-capacity, stack-allocated array type in Swift - with the familiar feel o
 - Fixed compile-time capacity.
 - Behaves like a standard array in usage and API.
 - Easily extended with custom buffer sizes.
+- Pure Swift implementation with no macros, code generation, or dependencies.
 
 ### Buffer Types & Capacity
 
